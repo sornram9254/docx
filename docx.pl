@@ -1,9 +1,32 @@
 #!/usr/bin/perl
-use File::Copy;
-use Archive::Zip;
-use Archive::Extract;
 use File::Path qw( rmtree );
-use Archive::Zip qw/ :ERROR_CODES :MISC_CONSTANTS /;
+=pod
+sub install_module(){
+    print "Press ENTER to Install...";
+    <STDIN>;
+    if($^O == "linux"){
+        system ("sudo apt-get install cpanminus -y"); # libpath-tiny-Perl
+    }
+    system ("cpan install File::Copy");
+    system ("cpan install Archive::Zip");
+    system ("cpan install Archive::Extract");
+}
+=cut
+BEGIN {
+    my $fails;
+    foreach my $module ( qw/File::Copy Archive::Zip Archive::Extract/ ) {
+        eval {
+            eval "require $module" or die;
+            $module->import;
+        };
+        if ($@ && $@ =~ /$module/) {
+            warn "You need to install the $module module";
+            $fails++;
+        }
+    }
+    #install_module();
+    exit if $fails;
+}
 
 my ($path_to_docx_file) = @ARGV;
 
